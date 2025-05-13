@@ -1,33 +1,36 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
-from flask_wtf.csrf import CSRFProtect
-from .routes import main as main_blueprint  # Убедитесь, что это правильный путь
+import os
 
 db = SQLAlchemy()
 login_manager = LoginManager()
-csrf = CSRFProtect()
 
 def create_app():
-    app = Flask(__name__, template_folder='../templates', static_folder='../static')
-    app.config['SECRET_KEY'] = 'your-secret-key'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
+    app = Flask(__name__)
 
+    # Загрузка конфигурации
+    from app import config
+    app.config.from_object(config)
+
+    # Инициализация расширений
     db.init_app(app)
     login_manager.init_app(app)
-    csrf.init_app(app)
+    login_manager.login_view = 'auth.login'  # Редирект при попытке доступа без авторизации
 
-    login_manager.login_view = 'auth.login'
+    # Создание необходимых директорий, если их нет
+    os.makedirs(app.config['AUDIO_UPLOAD_FOLDER'], exist_ok=True)
+    os.makedirs(app.config['IMAGE_UPLOAD_FOLDER'], exist_ok=True)
 
-    from .models import User
-    with app.app_context():
-        db.create_all()
+    # Регистрация блюпринтов
+    from app.auth.routes import auth_bp
+    from app.main.routes import main_bp
+    from app.profile.routes import profile_bp
+    from app.generate.routes import generate_bp
 
-    from .auth import auth as auth_blueprint
-    app.register_blueprint(auth_blueprint)
-
-    from .routes import main as main_blueprint
-    app.register_blueprint(main_blueprint)
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(main_bp)
+    app.register_blueprint(profile_bp)
+    app.register_blueprint(generate_bp)
 
     return app
-

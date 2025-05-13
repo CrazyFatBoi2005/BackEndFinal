@@ -4,9 +4,11 @@ import os
 
 main = Blueprint('main', __name__)
 
+
 @main.route('/')
 def index():
     return render_template('index.html')
+
 
 @main.route('/generate', methods=['POST'])
 @login_required
@@ -20,9 +22,11 @@ def generate():
     image_path = generate_image_from_prompt(prompt)
     return jsonify({'image_url': '/' + image_path})
 
+
 @main.route('/generated/<filename>')
 def generated_image(filename):
     return send_from_directory('static/generated', filename)
+
 
 def generate_image_from_prompt(prompt):
     os.makedirs('static/generated', exist_ok=True)
