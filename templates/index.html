@@ -6,7 +6,7 @@
     <p>Просто введите описание, и наш искусственный интеллект создаст для вас изображение</p>
 
     {% if current_user.is_authenticated %}
-        <a href="{{ url_for('profile') }}" class="btn">Начать создание</a>
+        <a href="{{ url_for('generate_image') }}" class="btn">Начать создание</a>
     {% else %}
         <div class="auth-buttons">
             <a href="{{ url_for('login') }}" class="btn">Войти</a>

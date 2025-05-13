@@ -1,24 +1,22 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="generator-container">
-    <h2><i class="fas fa-images"></i> Лента</h2>
-    <div class="features">
+<div class="container">
+    <h2>Все сгенерированные изображения</h2>
+
+    <div class="row">
         {% for image in images %}
-        <div class="feature-card">
-            <a href="{{ url_for('profile', user_id=image.user_id) }}">
-                <img src="{{ url_for('static', filename=image.file_path) }}" alt="Generated image" class="generated-image">
-            </a>
-            <p>
-                <a href="{{ url_for('profile', user_id=image.user_id) }}">
-                    <img src="{{ url_for('static', filename=image.user.avatar) }}" alt="Avatar" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px;">
-                    {{ image.user.username }}
-                </a>
-            </p>
-            <p>Создано: {{ image.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
-        </div>
-        {% else %}
-        <p class="text-center">Пока нет изображений в ленте.</p>
+            <div class="col-4 mb-4">
+                <div class="card shadow-sm border-0">
+                    <!-- Отображаем изображения с правильным путем -->
+                    <img src="{{ url_for('static', filename='uploads/' + image.image_path.split('/')[-1]) }}" alt="Generated Image" class="card-img-top" style="width: 100%; height: auto;">
+                    <div class="card-body">
+                        <p><strong>Описание:</strong> {{ image.prompt }}</p>
+                        <p><strong>Дата создания:</strong> {{ image.timestamp }}</p>
+                        <p><strong>Пользователь:</strong> {{ image.user.username }}</p>
+                    </div>
+                </div>
+            </div>
         {% endfor %}
     </div>
 </div>

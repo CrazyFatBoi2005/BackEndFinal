@@ -1,32 +1,25 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="card">
-    <div class="card-header">
-        <h2><i class="fas fa-user"></i> Профиль пользователя</h2>
-    </div>
-    <div class="card-body">
-        <div class="user-info">
-            <p><strong>Имя пользователя:</strong> {{ user.username }}</p>
-            <p><strong>Email:</strong> {{ user.email }}</p>
-        </div>
-    </div>
-</div>
+<div class="container">
+    <h2>Профиль пользователя</h2>
 
-<div class="generator-container">
-    <h2><i class="fas fa-image"></i> Генератор изображений</h2>
-    <form id="generateForm" class="generator-form">
-        <div class="form-group">
-            <label for="prompt">Опишите, что вы хотите увидеть:</label>
-            <textarea id="prompt" class="form-control" rows="3" placeholder="Например: 'Космический кот в стиле Ван Гога'" required></textarea>
-        </div>
-        <button type="submit" class="btn btn-block">
-            <i class="fas fa-magic"></i> Сгенерировать изображение
-        </button>
-    </form>
+    <p><strong>Username:</strong> {{ user.username }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
 
-    <div class="generator-result" id="result">
-        <!-- Здесь будет отображаться результат -->
+    <h3>Ваши сгенерированные изображения:</h3>
+    <div class="row">
+        {% for image in user.generated_images %}
+            <div class="col-4 mb-4">
+                <div class="card">
+                    <img src="{{ url_for('static', filename='uploads/' + image.image_path.split('/')[-1]) }}" alt="Generated Image" class="card-img-top" style="width: 100%;">
+                    <div class="card-body">
+                        <p><strong>Описание:</strong> {{ image.prompt }}</p>
+                        <p><strong>Дата создания:</strong> {{ image.timestamp }}</p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}

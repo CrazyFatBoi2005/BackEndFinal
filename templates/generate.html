@@ -1,21 +1,27 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="generator-container">
-    <h2><i class="fas fa-image"></i> Генератор изображений</h2>
-    <form id="generateForm" class="generator-form">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+<div class="form-container">
+    <h2><i class="fas fa-cogs"></i> Генерация изображения</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }} <!-- CSRF -->
+
         <div class="form-group">
-            <label for="prompt">Опишите, что вы хотите увидеть:</label>
-            <textarea id="prompt" class="form-control" rows="3" placeholder="Например: 'Космический кот в стиле Ван Гога'" required></textarea>
+            <label for="prompt">Описание</label>
+            {{ form.prompt(class="form-control", id="prompt", placeholder="Введите описание для генерации изображения") }}
         </div>
-        <button type="submit" class="btn btn-block">
-            <i class="fas fa-magic"></i> Сгенерировать изображение
-        </button>
+
+        <div class="form-group">
+            <label for="audio">Загрузите аудиофайл (MP3)</label>
+            {{ form.audio(class="form-control-file", id="audio") }}
+        </div>
+
+        <button type="submit" class="btn btn-block">Генерировать изображение</button>
     </form>
 
-    <div class="generator-result" id="result">
-        <!-- Здесь будет отображаться результат -->
+    <div id="result" class="mt-4">
+        <!-- Здесь будет отображаться результат генерации -->
     </div>
 </div>
 {% endblock %}
