@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="generator-container">
+    <h2><i class="fas fa-image"></i> Генератор изображений</h2>
+    <form id="generateForm" class="generator-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <div class="form-group">
+            <label for="prompt">Опишите, что вы хотите увидеть:</label>
+            <textarea id="prompt" class="form-control" rows="3" placeholder="Например: 'Космический кот в стиле Ван Гога'" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-block">
+            <i class="fas fa-magic"></i> Сгенерировать изображение
+        </button>
+    </form>
+
+    <div class="generator-result" id="result">
+        <!-- Здесь будет отображаться результат -->
+    </div>
+</div>
+{% endblock %}
