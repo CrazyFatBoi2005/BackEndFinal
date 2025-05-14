@@ -1,4 +1,3 @@
-import os
 import datetime
 import uuid
 
@@ -15,29 +14,24 @@ from flask_wtf.csrf import CSRFProtect
 from dotenv import load_dotenv
 import os
 
-# Загружаем переменные окружения из файла .env
 load_dotenv()
 
 client = OpenAI()
 
-# Инициализация приложения
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your-secret-key'
+app.config['SECRET_KEY'] = 'sample_secretkey'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['ALLOWED_EXTENSIONS'] = {'mp3', 'wav', 'flac'}
 
-# Инициализация базы данных
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-# Инициализация Flask-Login
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
-# Защита от CSRF атак
 csrf = CSRFProtect(app)
 
 
@@ -46,7 +40,6 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     username = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
-    # Связь с сгенерированными изображениями
     generated_images = db.relationship('GeneratedImage', backref='user', lazy=True)
 
 
@@ -58,7 +51,6 @@ class GeneratedImage(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
 
-# Загрузка пользователя
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -66,13 +58,12 @@ def load_user(user_id):
 
 @app.route('/')
 def index():
-    return render_template('index.html')  # Или другой шаблон для главной страницы
+    return render_template('index.html')
 
 
 @app.route('/feed')
 @login_required
 def feed():
-    # Получаем все сгенерированные изображения
     all_images = GeneratedImage.query.all()
     all_images.reverse()
     return render_template('feed.html', images=all_images)
@@ -86,19 +77,17 @@ def allowed_file(filename):
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
-        # Логика регистрации пользователя
         hashed_password = generate_password_hash(form.password.data)
         new_user = User(email=form.email.data, username=form.username.data, password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
         flash('Аккаунт создан успешно!', 'success')
-        return redirect(url_for('login'))  # Перенаправление на страницу входа
+        return redirect(url_for('login'))
     return render_template('register.html', form=form)
 
 
 def generate_image_from_prompt(prompt):
     try:
-        # Запрос к OpenAI для генерации изображения
         response = client.images.generate(
             model="gpt-image-1",
             prompt=prompt
@@ -107,17 +96,16 @@ def generate_image_from_prompt(prompt):
         image_base64 = response.data[0].b64_json
         image_bytes = base64.b64decode(image_base64)
 
-        # Сохраняем изображение в файл
         unique_filename = f"{uuid.uuid4().hex}_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.png"
         file_path = f"static/uploads/{unique_filename}"
         with open(file_path, "wb") as f:
             f.write(image_bytes)
 
         print(f"Изображение успешно сохранено как {file_path}")
-        return file_path  # Возвращаем путь к изображению
+        return file_path
 
     except Exception as e:
-        return f"Error: {str(e)}"  # В случае ошибки возвращаем текст ошибки
+        return f"Error: {str(e)}"
 
 
 @app.route('/generate', methods=['GET', 'POST'])
@@ -125,17 +113,14 @@ def generate_image_from_prompt(prompt):
 def generate_image():
     form = ImageGenerationForm()
     if form.validate_on_submit():
-        # Получаем аудиофайл из формы (если требуется)
+
         audio_file = request.files['audio']
         if audio_file and allowed_file(audio_file.filename):
             filename = secure_filename(audio_file.filename)
             audio_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             audio_file.save(audio_path)
 
-        # Получаем текстовое описание для генерации
         prompt = form.prompt.data
-
-        # Генерация изображения
         image_url = generate_image_from_prompt(prompt)
 
         if "Error" in image_url:
@@ -143,10 +128,9 @@ def generate_image():
         else:
             flash('Изображение успешно сгенерировано!', 'success')
 
-            # Сохраняем информацию о сгенерированном изображении в базе данных
             generated_image = GeneratedImage(
                 user_id=current_user.id,
-                image_path=image_url,  # Сохраняем путь к изображению
+                image_path=image_url,
                 prompt=prompt
             )
             db.session.add(generated_image)
