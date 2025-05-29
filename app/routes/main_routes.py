@@ -47,7 +47,7 @@ def generate_image_from_prompt(prompt):
 
         # Сохраняем изображение в файл
         unique_filename = f"{uuid.uuid4().hex}_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.png"
-        file_path = f"static/uploads/{unique_filename}"
+        file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], unique_filename)
         with open(file_path, "wb") as f:
             f.write(image_bytes)
 
@@ -84,13 +84,13 @@ def generate_image():
             # Сохраняем информацию о сгенерированном изображении в базе данных
             generated_image = GeneratedImage(
                 user_id=current_user.id,
-                image_path=image_url,  # Сохраняем путь к изображению
+                image_path="/".join(image_url.split("\\")[-3:-1]),  # Сохраняем путь к изображению
                 prompt=prompt
             )
             db.session.add(generated_image)
             db.session.commit()
 
-            return redirect('main.feed')
+            return redirect(url_for('main.feed'))
 
     return render_template('generate.html', form=form)
 
