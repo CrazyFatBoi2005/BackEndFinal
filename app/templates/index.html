@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="hero-section">
+        <h1>Создавайте уникальные изображения с помощью ИИ</h1>
+        <p>Просто введите описание, и наш искусственный интеллект создаст для вас изображение</p>
+
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('main.generate_image') }}" class="btn">Начать создание</a>
+        {% else %}
+            <div class="auth-buttons">
+                <a href="{{ url_for('auth.login') }}" class="btn">Войти</a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-outline">Регистрация</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="features">
+        <div class="feature-card">
+            <i class="fas fa-magic"></i>
+            <h3>Простота</h3>
+            <p>Просто введите текстовое описание того, что вы хотите увидеть</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-bolt"></i>
+            <h3>Быстро</h3>
+            <p>Генерация изображений занимает всего несколько секунд</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-paint-brush"></i>
+            <h3>Креативно</h3>
+            <p>Уникальные изображения, созданные специально для вас</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

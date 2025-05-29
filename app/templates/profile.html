@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Профиль пользователя</h2>
+
+    <p><strong>Username:</strong> {{ user.username }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <a href="{{ url_for('auth.change_password') }}" class="btn btn-outline-primary mb-4">Сменить пароль</a>
+
+    <h3>Ваши сгенерированные изображения:</h3>
+    <div class="row">
+        {% for image in user.generated_images %}
+            <div class="col-4 mb-4">
+                <div class="card">
+                    <img src="{{ url_for('static', filename='uploads/' + image.image_path.split('/')[-1]) }}" alt="Generated Image" class="card-img-top" style="width: 100%;">
+                    <div class="card-body">
+                        <p><strong>Описание:</strong> {{ image.prompt }}</p>
+                        <p><strong>Дата создания:</strong> {{ image.timestamp.strftime('%Y-%m-%d %H:%M') }}</p>
+
+                        <!-- Кнопка удаления -->
+                        <form method="POST" action="{{ url_for('main.delete_image', image_id=image.id) }}">
+                            <input type="hidden" name="_method" value="DELETE">
+                            {{ csrf_token() }}
+                            <button type="submit" class="btn btn-danger btn-sm mt-2">Удалить</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
