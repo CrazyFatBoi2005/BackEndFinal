@@ -84,7 +84,7 @@ def generate_image():
             # Сохраняем информацию о сгенерированном изображении в базе данных
             generated_image = GeneratedImage(
                 user_id=current_user.id,
-                image_path="/".join(image_url.split("\\")[-3:-1]),  # Сохраняем путь к изображению
+                image_path="/".join(image_url.split("\\")[-3:]),  # Сохраняем путь к изображению
                 prompt=prompt
             )
             db.session.add(generated_image)
